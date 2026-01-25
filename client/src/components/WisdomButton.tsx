@@ -1,4 +1,5 @@
-import React from 'react';
+// client/src/components/WisdomButton/WisdomButton.tsx
+import React, { useState } from 'react';
 
 const WisdomButton: React.FC = () => {
   return (

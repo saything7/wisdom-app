@@ -1,5 +1,5 @@
 import React from 'react';
-import WisdomButton from './components/WisdomButton';
+import WisdomButton from '@components/WisdomButton';
 
 const App: React.FC = () => {
   return (
