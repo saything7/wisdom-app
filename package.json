@@ -17,7 +17,13 @@
     "lint:server": "cd server && npm run lint"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "@eslint/js": "^9.39.2",
+    "concurrently": "^8.2.2",
+    "eslint": "^9.39.2",
+    "eslint-plugin-react": "^7.37.5",
+    "globals": "^17.1.0",
+    "jiti": "^2.6.1",
+    "typescript-eslint": "^8.53.1"
   },
   "workspaces": [
     "client",

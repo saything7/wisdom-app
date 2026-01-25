@@ -8,10 +8,12 @@ import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
-    ThrottlerModule.forRoot([{
-      ttl: 3600, // 1 час
-      limit: 3,   // 3 запроса
-    }]),
+    ThrottlerModule.forRoot([
+      {
+        ttl: 3600, // 1 час
+        limit: 3, // 3 запроса
+      },
+    ]),
     QuotesModule,
     CounterModule,
   ],
