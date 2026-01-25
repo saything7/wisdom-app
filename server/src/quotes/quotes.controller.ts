@@ -11,10 +11,7 @@ export class QuotesController {
     constructor(
         private readonly quotesService: QuotesService,
         private readonly counterService: CounterService,
-    ) {}git checkout main
-    git checkout main
-    git add server/
-
+    ) {}
 
     @Get('random')
     getRandomQuote(@Req() request: Request, @Res() response: Response) {
