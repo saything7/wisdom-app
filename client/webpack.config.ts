@@ -1,10 +1,11 @@
+// client/webpack.config.ts
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
-module.exports = (env, argv) => {
+module.exports = (env: any, argv: { mode: string }) => {
   const isProduction = argv.mode === 'production';
-  
+
   return {
     entry: './src/index.tsx',
     output: {
@@ -52,9 +53,9 @@ module.exports = (env, argv) => {
               loader: 'css-loader',
               options: {
                 modules: {
-                  localIdentName: isProduction 
-                    ? '[hash:base64:8]' 
-                    : '[path][name]__[local]--[hash:base64:5]',
+                  localIdentName: isProduction
+                      ? '[hash:base64:8]'
+                      : '[path][name]__[local]--[hash:base64:5]',
                   exportLocalsConvention: 'camelCase'
                 },
                 importLoaders: 1
