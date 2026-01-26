@@ -79,7 +79,7 @@ const WisdomButton: React.FC<WisdomButtonProps> = ({
 
             {disabled && !loading && !internalLoading && (
                 <div className={styles.disabledMessage}>
-                    ⚠️ Лимит запросов достигнут
+                    Стетхем устал, приходите позже!
                 </div>
             )}
         </div>

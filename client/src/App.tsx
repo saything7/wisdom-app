@@ -30,7 +30,6 @@ const App: React.FC = () => {
         maxRequests,
         remainingRequests,
         getWisdom,
-        handleResetLimit,
     } = useWisdomLogic();
 
     return (
@@ -42,7 +41,6 @@ const App: React.FC = () => {
                     onGetWisdom={getWisdom}
                     loading={loading}
                     disabled={sessionCount >= maxRequests}
-                    onReset={handleResetLimit}
                 />
 
                 {error && <ErrorDisplay error={error} />}
@@ -83,14 +81,12 @@ interface ButtonSectionProps {
     onGetWisdom: () => Promise<void>;
     loading: boolean;
     disabled: boolean;
-    onReset: () => void;
 }
 
 const ButtonSection: React.FC<ButtonSectionProps> = ({
                                                          onGetWisdom,
                                                          loading,
                                                          disabled,
-                                                         onReset,
                                                      }) => (
     <div className="button-container">
         <WisdomButton
@@ -98,12 +94,6 @@ const ButtonSection: React.FC<ButtonSectionProps> = ({
             loading={loading}
             disabled={disabled}
         />
-        <button
-            onClick={onReset}
-            className="reset-button"
-        >
-            Сбросить лимит (тест)
-        </button>
     </div>
 );
 
@@ -118,8 +108,8 @@ const Footer: React.FC<{
 }> = ({ sessionCount, totalCount, maxRequests }) => (
     <footer className="footer">
         <p>Мудрость обновляется при каждом клике</p>
-        <p>Запросов в этой сессии: {sessionCount}/{maxRequests}</p>
-        <p>Всего получено цитат: {totalCount}</p>
+        {/*<p>Запросов в этой сессии: {sessionCount}/{maxRequests}</p>
+        <p>Всего получено цитат: {totalCount}</p>*/}
     </footer>
 );
 
