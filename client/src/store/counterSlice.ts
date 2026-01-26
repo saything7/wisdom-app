@@ -14,7 +14,7 @@ const initialState: CounterState = {
     lastReset: null,
 };
 
-const counterSlice = createSlice({
+export const counterSlice = createSlice({  // Добавляем export здесь!
     name: 'counter',
     initialState,
     reducers: {
@@ -68,6 +68,7 @@ const counterSlice = createSlice({
     },
 });
 
+// Экспортируем actions
 export const {
     incrementSession,
     incrementTotal,
@@ -76,4 +77,8 @@ export const {
     setMaxRequests,
     loadFromStorage,
 } = counterSlice.actions;
+
+// Экспортируем reducer
 export default counterSlice.reducer;
+
+// Экспортируем сам slice (опционально)
