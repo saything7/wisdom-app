@@ -13,25 +13,19 @@ export class CounterService implements ICounterService {
 
   increment(userId: string): number {
     const now = Date.now();
-    const userCounter = this.userCounters.get(userId);
+    let userCounter = this.userCounters.get(userId);
 
     if (!userCounter) {
-      this.userCounters.set(userId, { count: 1, lastRequestTime: now });
+      userCounter = { count: 1, lastRequestTime: now };
+      this.userCounters.set(userId, userCounter);
       return 1;
     }
 
-    const timePassed = now - userCounter.lastRequestTime;
-
-    if (timePassed >= this.RESET_INTERVAL) {
-      userCounter.count = 1;
-    } else {
-      userCounter.count++;
-    }
-
+    // Всегда увеличиваем, без сброса
+    userCounter.count++;
     userCounter.lastRequestTime = now;
     return userCounter.count;
   }
-
   getCount(userId: string): number {
     const counter = this.userCounters.get(userId);
     return counter ? counter.count : 0;

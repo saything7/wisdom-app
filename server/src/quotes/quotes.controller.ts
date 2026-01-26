@@ -9,11 +9,19 @@ import {
   ValidationPipe,
   HttpCode,
   HttpStatus,
+  Req,
 } from '@nestjs/common';
+import { Request } from 'express';
 import type { IQuotesService } from './quotes.service.interface';
+import type { ICounterService } from '../counter/counter.service.interface';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { CreateQuoteDto } from './dto/create-quote.dto';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
+
+// Интерфейс для Request с userId
+interface RequestWithUserId extends Request {
+  userId?: string;
+}
 
 @ApiTags('quotes')
 @Controller('api/quotes')
@@ -22,15 +30,17 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 export class QuotesController {
   constructor(
     @Inject('IQuotesService') private readonly quotesService: IQuotesService,
+    @Inject('ICounterService') private readonly counterService: ICounterService,
   ) {}
 
   @Get()
   @ApiOperation({ summary: 'Получить все цитаты' })
   @ApiResponse({ status: 200, description: 'Список всех цитат' })
   getAllQuotes() {
+    const quotes = this.quotesService.getAllQuotes();
     return {
-      quotes: this.quotesService.getAllQuotes(),
-      total: this.quotesService.getAllQuotes().length,
+      quotes,
+      total: quotes.length,
       timestamp: new Date().toISOString(),
     };
   }
@@ -39,9 +49,17 @@ export class QuotesController {
   @ApiOperation({ summary: 'Получить случайную цитату' })
   @ApiResponse({ status: 200, description: 'Случайная цитата' })
   @ApiResponse({ status: 429, description: 'Слишком много запросов' })
-  getRandomQuote() {
+  getRandomQuote(@Req() req: RequestWithUserId) {
+    const userId = req.userId || 'anonymous';
+    const quote = this.quotesService.getRandomQuote();
+
+    // Безопасный вызов - userId точно string
+    const count = this.counterService.increment(userId);
+
     return {
-      quote: this.quotesService.getRandomQuote(),
+      quote,
+      count,
+      userId,
       timestamp: new Date().toISOString(),
     };
   }
@@ -53,7 +71,6 @@ export class QuotesController {
   @ApiResponse({ status: 201, description: 'Цитата успешно добавлена' })
   @ApiResponse({ status: 400, description: 'Невалидные данные' })
   addQuote(@Body() createQuoteDto: CreateQuoteDto) {
-    // В будущем: this.quotesService.addQuote(createQuoteDto.text);
     return {
       message: 'Цитата добавлена (заглушка)',
       quote: createQuoteDto.text,
