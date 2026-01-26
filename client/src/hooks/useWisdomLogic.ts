@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     fetchQuote,
@@ -17,10 +17,11 @@ import {
 } from '../store/export';
 import { storage } from '../utils/storage';
 
+
 export const useWisdomLogic = () => {
     const dispatch = useDispatch();
 
-    // Селекторы через отдельные функции
+    // Селекторы
     const quote = useSelector(selectQuoteText);
     const loading = useSelector(selectQuoteLoading);
     const error = useSelector(selectQuoteError);
@@ -28,11 +29,31 @@ export const useWisdomLogic = () => {
     const totalCount = useSelector(selectTotalCount);
     const maxRequests = useSelector(selectMaxRequests);
 
-    const remainingRequests = maxRequests - sessionCount;
+    // Состояние UI
+    const [uiStatus, setUiStatus] = useState(storage.getUIStatus());
+
+    // Обновляем статус каждую секунду
+    useEffect(() => {
+        const interval = setInterval(() => {
+            // Проверяем, не истёк ли таймер
+            const wasReset = storage.checkAndResetIfExpired();
+
+            if (wasReset && sessionCount > 0) {
+                // Если был сброс - обновляем Redux
+                dispatch(resetSession());
+            }
+
+            // Обновляем UI статус
+            setUiStatus(storage.getUIStatus());
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, [dispatch, sessionCount]);
 
     const getWisdom = useCallback(async () => {
-        if (sessionCount >= maxRequests) {
-            dispatch(clearQuote());
+        // Проверяем, можно ли делать запрос
+        if (!uiStatus.canMakeRequest) {
+            console.log('Лимит исчерпан. Подождите:', storage.getTimeUntilReset());
             return;
         }
 
@@ -40,40 +61,54 @@ export const useWisdomLogic = () => {
             const resultAction = await dispatch(fetchQuote() as any);
 
             if (fetchQuote.fulfilled.match(resultAction)) {
+                // Регистрируем запрос в storage
+                storage.registerRequest();
+
+                // Обновляем Redux
                 dispatch(incrementSession());
 
-                const newSessionCount = sessionCount + 1;
+                // Обновляем общий счётчик
                 const newTotalCount = totalCount + 1;
-
-                // Сохраняем в storage
-                storage.setSession(newSessionCount);
                 storage.setTotalCount(newTotalCount);
+
+                // Сохраняем в историю
                 storage.addToHistory({
                     quote: resultAction.payload.text,
-                    sessionCount: newSessionCount,
+                    sessionCount: sessionCount + 1,
                     totalCount: newTotalCount,
                 });
 
+                // Обновляем UI статус
+                setUiStatus(storage.getUIStatus());
+
             } else if (fetchQuote.rejected.match(resultAction)) {
                 const errorMessage = getErrorMessage(resultAction);
-
                 if (isRateLimitError(errorMessage)) {
-                    dispatch(setSessionCount(maxRequests));
-                    storage.setSession(maxRequests);
+                    // Если получили 429 - блокируем
+                    handleRateLimitError();
                 }
             }
         } catch (err: any) {
             console.error('Ошибка в getWisdom:', err);
             if (isRateLimitError(err.message)) {
-                dispatch(setSessionCount(maxRequests));
+                handleRateLimitError();
             }
         }
-    }, [dispatch, sessionCount, maxRequests, totalCount]);
+    }, [dispatch, sessionCount, totalCount, uiStatus.canMakeRequest]);
 
-    const handleResetLimit = useCallback(() => {
+    const handleRateLimitError = useCallback(() => {
+        // Устанавливаем максимальный счётчик и запускаем таймер
+        storage.startTimer();
+        storage.setSession(maxRequests);
+        dispatch(setSessionCount(maxRequests));
+        setUiStatus(storage.getUIStatus());
+    }, [dispatch, maxRequests]);
+
+    const resetLimit = useCallback(() => {
+        storage.resetAll();
         dispatch(resetSession());
         dispatch(clearQuote());
-        storage.clearSession();
+        setUiStatus(storage.getUIStatus());
     }, [dispatch]);
 
     return {
@@ -83,13 +118,19 @@ export const useWisdomLogic = () => {
         sessionCount,
         totalCount,
         maxRequests,
-        remainingRequests,
+        remainingRequests: uiStatus.remainingRequests,
+        canMakeRequest: uiStatus.canMakeRequest,
+        timeLeft: uiStatus.timeLeft,
+        shouldShowTimer: uiStatus.shouldShowTimer,
+        isTimerActive: uiStatus.isTimerActive,
+        isLimitExhausted: uiStatus.isLimitExhausted,
+        formatTime: storage.formatTime,
         getWisdom,
-        handleResetLimit,
+        resetLimit,
     };
 };
 
-// Вспомогательные функции
+// Вспомогательные функции остаются без изменений
 const getErrorMessage = (resultAction: any): string => {
     if (typeof resultAction.error?.message === 'string') {
         return resultAction.error.message;
@@ -103,5 +144,7 @@ const getErrorMessage = (resultAction: any): string => {
 const isRateLimitError = (message: string): boolean => {
     return message.includes('Стетхем') ||
         message.includes('429') ||
-        message.includes('Too Many Requests');
+        message.includes('Too Many Requests') ||
+        message.includes('rate limit') ||
+        message.includes('лимит');
 };
