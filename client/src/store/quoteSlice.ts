@@ -19,7 +19,7 @@ export const fetchQuote = createAsyncThunk(
     'quote/fetchQuote',
     async (_, { rejectWithValue }) => {
         try {
-            const response = await fetch('http://localhost:3001/quotes/random');
+            const response = await fetch('http://localhost:3001/api/quotes/random');
 
             if (!response.ok) {
                 if (response.status === 429) {
