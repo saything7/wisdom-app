@@ -1,33 +1,28 @@
-// server/src/counter/counter.controller.ts
-import { Controller, Get, Req, Res } from '@nestjs/common';
-import { CounterService } from './counter.service';
-import type { Request, Response } from 'express'; // Измени эту строку
+import { Controller, Get, Param, Inject } from '@nestjs/common';
+import type { ICounterService } from './counter.service.interface';
 
-@Controller('counter')
+@Controller('api/counter')
 export class CounterController {
-  constructor(private readonly counterService: CounterService) {}
+  constructor(
+    @Inject('ICounterService') private readonly counterService: ICounterService,
+  ) {}
 
-  @Get()
-  getCount(@Req() request: Request, @Res() response: Response) {
-    // Получаем или создаём userId из cookies
-    let userId = request.cookies?.userId;
-
-    if (!userId) {
-      // Генерируем новый ID для пользователя без cookie
-      userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      // Устанавливаем cookie на 30 дней
-      response.cookie('userId', userId, {
-        maxAge: 30 * 24 * 60 * 60 * 1000,
-        httpOnly: true,
-      });
-    }
-
-    const count = this.counterService.getCount(userId);
-
-    return response.json({
+  @Get(':userId')
+  getCount(@Param('userId') userId: string) {
+    return {
       userId,
-      count,
+      count: this.counterService.getCount(userId),
       timestamp: new Date().toISOString(),
-    });
+    };
+  }
+
+  @Get('stats/all')
+  getAllStats() {
+    const counters = this.counterService.getAllCounters();
+    return {
+      totalUsers: counters.size,
+      counters: Object.fromEntries(counters),
+      timestamp: new Date().toISOString(),
+    };
   }
 }
