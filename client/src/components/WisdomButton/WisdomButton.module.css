@@ -1,105 +1,179 @@
-/* Добавляем новые анимации */
-.button {
-    padding: 15px 30px;
-    font-size: 18px;
+/* WisdomButton.module.css */
+
+.wisdomButton {
+    background: linear-gradient(135deg,
+    rgba(0, 255, 234, 0.1) 0%,
+    rgba(58, 134, 255, 0.15) 100%);
+    color: #e0f7fa;
+    border: 2px solid rgba(0, 255, 234, 0.5);
+    padding: 18px 45px;
+    border-radius: 8px;
+    font-family: 'Arial Black', sans-serif;
+    font-size: 1.3rem;
     font-weight: bold;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border: none;
-    border-radius: 12px;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    min-width: 200px;
+    box-shadow:
+            0 0 20px rgba(0, 255, 234, 0.3),
+            inset 0 0 15px rgba(0, 255, 234, 0.1);
     position: relative;
     overflow: hidden;
+    min-width: 220px;
+    min-height: 70px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-shadow: 0 0 5px rgba(0, 255, 234, 0.7);
 }
 
-/* Эффект "волны" при нажатии */
-.button::after {
+/* Эффект неонового свечения при наведении */
+.wisdomButton:hover:not(:disabled) {
+    transform: translateY(-3px);
+    border-color: #00ffea;
+    box-shadow:
+            0 0 30px rgba(0, 255, 234, 0.5),
+            0 5px 20px rgba(0, 0, 0, 0.3),
+            inset 0 0 20px rgba(0, 255, 234, 0.2);
+    color: #ffffff;
+    text-shadow:
+            0 0 10px #00ffea,
+            0 0 20px rgba(0, 255, 234, 0.5);
+}
+
+/* Эффект активного нажатия */
+.wisdomButton:active:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow:
+            0 0 15px rgba(0, 255, 234, 0.4),
+            inset 0 0 10px rgba(0, 255, 234, 0.1);
+}
+
+/* Отключенное состояние */
+.wisdomButton:disabled {
+    background: rgba(100, 100, 100, 0.2);
+    color: #888;
+    border-color: rgba(100, 100, 100, 0.5);
+    cursor: not-allowed;
+    box-shadow: none;
+    text-shadow: none;
+}
+
+/* Эффект сканирующей линии (как в киберпанке) */
+.wisdomButton::before {
     content: '';
     position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 5px;
-    height: 5px;
-    background: rgba(255, 255, 255, 0.5);
-    opacity: 0;
-    border-radius: 100%;
-    transform: scale(1, 1) translate(-50%);
-    transform-origin: 50% 50%;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg,
+    transparent,
+    rgba(0, 255, 234, 0.8),
+    transparent);
+    animation: scan 3s infinite linear;
 }
 
-.button:focus:not(:active)::after {
-    animation: ripple 1s ease-out;
+@keyframes scan {
+    0% { left: -100%; }
+    100% { left: 100%; }
 }
 
-@keyframes ripple {
+/* Анимация превращения в спиннер (исправленная) */
+.wisdomButton.spinning {
+    animation: buttonToSpinner 0.5s forwards;
+    border-radius: 50%;
+    padding: 0;
+    width: 70px;
+    height: 70px;
+    min-width: 70px;
+    border-color: rgba(0, 255, 234, 0.8);
+    /* Убираем pulse-cyan отсюда - переносим в спиннер */
+}
+
+@keyframes buttonToSpinner {
     0% {
-        transform: scale(0, 0);
-        opacity: 0.5;
+        border-radius: 8px;
+        width: 220px;
     }
-    20% {
-        transform: scale(25, 25);
-        opacity: 0.3;
+    50% {
+        box-shadow: 0 0 25px rgba(0, 255, 234, 0.6);
     }
     100% {
-        opacity: 0;
-        transform: scale(40, 40);
+        border-radius: 50%;
+        width: 70px;
+        box-shadow:
+                0 0 20px rgba(0, 255, 234, 0.4),
+                0 0 40px rgba(0, 255, 234, 0.2);
     }
 }
 
-/* Анимация вращения с минимальной длительностью */
-.spinner {
-    width: 20px;
-    height: 20px;
-    border: 3px solid rgba(255, 255, 255, 0.3);
+/* ИСПРАВЛЕННЫЙ СПИННЕР (без конфликтов) */
+.buttonSpinner {
+    width: 36px;
+    height: 36px;
+    border: 3px solid rgba(0, 255, 234, 0.1);
+    border-top: 3px solid #00ffea;
     border-radius: 50%;
-    border-top-color: white;
-    animation: spin 1.5s linear infinite; /* Увеличиваем время */
+    animation: spinWithDrill 0.7s linear infinite;
+
+    /* Оптимизация */
+    will-change: transform;
+    backface-visibility: hidden;
+    transform: translateZ(0);
 }
 
-/* Гарантируем минимум 2 секунды анимации даже при быстром ответе */
-.spinner.minimum-spin {
-    animation: spin 1.5s linear infinite, fadeOut 0.5s ease 2s forwards;
+/* КОМБИНИРОВАННАЯ АНИМАЦИЯ без конфликтов */
+@keyframes spinWithDrill {
+    0% {
+        transform: rotate(0deg) scale(1);
+        border-top-color: #00ffea;
+        border-width: 3px;
+    }
+    25% {
+        transform: rotate(90deg) scale(1.02) translate(0.3px, -0.3px);
+        border-top-color: #3a86ff;
+        border-width: 4px;
+        box-shadow: 0 0 15px rgba(0, 255, 234, 0.5);
+    }
+    50% {
+        transform: rotate(180deg) scale(0.98) translate(-0.3px, 0.3px);
+        border-top-color: #ff00ff;
+        border-width: 3px;
+        box-shadow: 0 0 20px rgba(255, 0, 255, 0.4);
+    }
+    75% {
+        transform: rotate(270deg) scale(1.01) translate(-0.2px, -0.2px);
+        border-top-color: #3a86ff;
+        border-width: 4px;
+        box-shadow: 0 0 15px rgba(58, 134, 255, 0.5);
+    }
+    100% {
+        transform: rotate(360deg) scale(1);
+        border-top-color: #00ffea;
+        border-width: 3px;
+        box-shadow: 0 0 10px rgba(0, 255, 234, 0.3);
+    }
 }
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+/* /* Эффект свечения текста на кнопке */
+.buttonText {
+    position: relative;
+    z-index: 1;
 }
 
-@keyframes fadeOut {
-    to { opacity: 0; }
+/* Опционально: добавьте это если хотите двойную границу */
+.wisdomButton::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border: 1px solid rgba(255, 0, 255, 0.3);
+    border-radius: 10px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
-/* Пульсация для кнопки в состоянии загрузки */
-.button.loading {
-    animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-    0% { box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4); }
-    50% { box-shadow: 0 4px 25px rgba(102, 126, 234, 0.7); }
-    100% { box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4); }
-}
-
-.button:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
-}
-
-.button:active:not(:disabled) {
-    transform: translateY(0);
-}
-
-.button:disabled {
-    background: #cccccc;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
+.wisdomButton:hover:not(:disabled)::after {
+    opacity: 1;
 }

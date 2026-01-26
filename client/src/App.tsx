@@ -6,19 +6,20 @@ import { useAutoReset } from './hooks/useAutoReset';
 import WisdomButton from './components/WisdomButton';
 import QuoteDisplay from './components/QuoteDisplay';
 import CounterDisplay from './components/CounterDisplay';
-import {LimitWarning} from './components/LimitWarning';
-import {LimitExhausted} from './components/LimitExhausted';
-import './App.css';
+import {LimitExhausted} from '@components/LimitExhausted/LimitExhausted';
+import styles from './App.module.css'; // ← ИЗМЕНЕНИЕ 1: без точки!
+
 
 const App: React.FC = () => {
     const dispatch = useDispatch();
+    const [showQuoteWithDelay, setShowQuoteWithDelay] = React.useState(false);
+    const [isLoadingManual, setIsLoadingManual] = React.useState(false);
+    const [hasInitialClick, setHasInitialClick] = React.useState(false); // ← НОВОЕ
 
-    // Загрузка из localStorage при монтировании
     React.useEffect(() => {
         dispatch(loadFromStorage());
     }, [dispatch]);
 
-    // Автосброс лимита
     useAutoReset();
 
     const {
@@ -30,34 +31,107 @@ const App: React.FC = () => {
         maxRequests,
         remainingRequests,
         getWisdom,
-        handleResetLimit,
     } = useWisdomLogic();
 
+    const handleGetWisdom = async () => {
+        if (!hasInitialClick) {
+            setHasInitialClick(true); // ← Отмечаем первый клик
+        }
+
+        setIsLoadingManual(true);
+
+        try {
+            await getWisdom();
+        } catch (err) {
+            setIsLoadingManual(false);
+            setHasInitialClick(false);
+        }
+
+        // Задержка 2 секунды даже если API быстро ответил
+        setTimeout(() => {
+            setIsLoadingManual(false);
+        }, 2000);
+    };
+
+    // Эффект для сброса при обновлении/новой сессии
+    React.useEffect(() => {
+        if (!quote) {
+            setHasInitialClick(false); // ← Сбрасываем при отсутствии цитаты
+            setIsLoadingManual(false);
+            setShowQuoteWithDelay(false);
+        }
+    }, [quote]);
+
+    // Эффект для задержки показа цитаты
+    React.useEffect(() => {
+        if (quote && !loading) {
+            setShowQuoteWithDelay(false);
+            const timer = setTimeout(() => {
+                setShowQuoteWithDelay(true);
+            }, 2000);
+
+            return () => clearTimeout(timer);
+        }
+    }, [quote, loading]);
+
+    const totalLoading = loading || isLoadingManual;
+    const showInitialButton = !quote && !hasInitialClick; // Показывать начальную кнопку?
+
     return (
-        <div className="app">
+        <div className={styles.app}>
             <Header />
 
-            <main className="main">
-                <ButtonSection
-                    onGetWisdom={getWisdom}
-                    loading={loading}
-                    disabled={sessionCount >= maxRequests}
-                    onReset={handleResetLimit}
-                />
+            <main className={styles.main}>
+                <p className={styles.subtitle}>Нажми кнопку для получения мудрости!</p>
+
+                <div className={styles.centralContainer}>
+                    {/* Случай 1: Есть цитата и прошло 2 секунды */}
+                    {quote && !totalLoading && showQuoteWithDelay ? (
+                            <>
+                                <div className={styles.quoteContainer}>
+                                    <QuoteDisplay quote={quote}
+                                                  shouldAnimate={true}/>
+                                </div>
+
+                                <div className={styles.newQuoteContainer}>
+                                    <button
+                                        onClick={handleGetWisdom}
+                                        className={styles.newQuoteButton}
+                                        disabled={sessionCount >= maxRequests || totalLoading}
+                                    >
+                                        📜 Новая цитата
+                                    </button>
+                                </div>
+                            </>
+                        ) : /* Случай 2: Начальная кнопка (первый раз) */
+                        showInitialButton ? (
+                                <button
+                                    onClick={handleGetWisdom}
+                                    className={styles.initialButton}
+                                    disabled={sessionCount >= maxRequests}
+                                >
+                                    🎬 Дай мне мудрость
+                                </button>
+                            ) : /* Случай 3: Загрузка или кнопка-спиннер */
+                            (
+                                <WisdomButton
+                                    onGetWisdom={handleGetWisdom}
+                                    loading={totalLoading}
+                                    disabled={sessionCount >= maxRequests}
+                                    showSpinner={totalLoading}
+                                />
+                            )}
+                </div>
 
                 {error && <ErrorDisplay error={error} />}
-                {quote && <QuoteDisplay quote={quote} />}
 
+                {/* Счетчики и лимиты */}
                 <CounterDisplay
                     sessionCount={sessionCount}
                     totalCount={totalCount}
                     maxRequests={maxRequests}
                 />
 
-                <LimitWarning
-                    remainingRequests={remainingRequests}
-                    maxRequests={maxRequests}
-                />
 
                 {remainingRequests === 0 && <LimitExhausted />}
             </main>
@@ -69,46 +143,16 @@ const App: React.FC = () => {
             />
         </div>
     );
-};
-
-// Выносим мелкие компоненты
+};// Выносим мелкие компоненты
 const Header = () => (
-    <header className="header">
-        <h1 className="title">Цитатник Джейсона Стэйтема</h1>
-        <p className="subtitle">Нажми кнопку для получения мудрости!</p>
+    <header className={styles.header}> {/* ← ИЗМЕНЕНИЕ 4 */}
+        <h1 className={styles.title}>Цитатник Джейсона Стэйтема</h1>
     </header>
 );
 
-interface ButtonSectionProps {
-    onGetWisdom: () => Promise<void>;
-    loading: boolean;
-    disabled: boolean;
-    onReset: () => void;
-}
-
-const ButtonSection: React.FC<ButtonSectionProps> = ({
-                                                         onGetWisdom,
-                                                         loading,
-                                                         disabled,
-                                                         onReset,
-                                                     }) => (
-    <div className="button-container">
-        <WisdomButton
-            onGetWisdom={onGetWisdom}
-            loading={loading}
-            disabled={disabled}
-        />
-        <button
-            onClick={onReset}
-            className="reset-button"
-        >
-            Сбросить лимит (тест)
-        </button>
-    </div>
-);
 
 const ErrorDisplay: React.FC<{ error: string }> = ({ error }) => (
-    <div className="error">❌ {error}</div>
+    <div className={styles.error}>❌ {error}</div>
 );
 
 const Footer: React.FC<{
@@ -116,10 +160,8 @@ const Footer: React.FC<{
     totalCount: number;
     maxRequests: number;
 }> = ({ sessionCount, totalCount, maxRequests }) => (
-    <footer className="footer">
+    <footer className={styles.footer}> {/* ← ИЗМЕНЕНИЕ 7 */}
         <p>Мудрость обновляется при каждом клике</p>
-        <p>Запросов в этой сессии: {sessionCount}/{maxRequests}</p>
-        <p>Всего получено цитат: {totalCount}</p>
     </footer>
 );
 
