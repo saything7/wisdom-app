@@ -1,11 +1,16 @@
-// server/src/counter/counter.module.ts
 import { Module } from '@nestjs/common';
-import { CounterService } from './counter.service';
 import { CounterController } from './counter.controller';
+import { CounterService } from './counter.service';
 
 @Module({
   controllers: [CounterController],
-  providers: [CounterService],
-  exports: [CounterService],
+  providers: [
+    CounterService,
+    {
+      provide: 'ICounterService',
+      useExisting: CounterService,
+    },
+  ],
+  exports: ['ICounterService'],
 })
 export class CounterModule {}
