@@ -54,11 +54,11 @@ const QuoteDisplay: React.FC<QuoteDisplayProps> = ({ quote, shouldAnimate = true
 
     return (
         <div className={styles.container}>
-            <div className={styles.quoteMark}>"</div>
+            <div className={styles.quoteMark}></div>
             <p className={styles.quote}>
                 {isAnimating && letters.length > 0 ? letters : displayedText}
             </p>
-            <div className={styles.quoteMark}>"</div>
+            <div className={styles.quoteMark}></div>
         </div>
     );
 };
