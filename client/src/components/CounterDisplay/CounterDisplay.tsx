@@ -45,10 +45,14 @@ const CounterDisplay: React.FC<CounterDisplayProps> = ({
                     />
                 </div>
                 <div className={styles.progressLabel}>
-                    {remaining > 0 ? (
-                        <span>Осталось: {remaining} запросов</span>
+                    {remaining === 3 ? (
+                        <span>Осталось 3 запроса из 3-х запросов</span>
+                    ) : remaining === 2 ? (
+                        <span>Осталось 2 запроса из 3-х запросов</span>
+                    ) : remaining === 1 ? (
+                        <span>Остался 1 запрос из 3-х запросов</span>
                     ) : (
-                        <span className={styles.limitText}>⚠️ Лимит достигнут</span>
+                        <span className={styles.statham}>Стетхем устал, приходите позже</span>
                     )}
                 </div>
             </div>

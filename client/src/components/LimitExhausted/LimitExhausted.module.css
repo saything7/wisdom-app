@@ -1,0 +1,43 @@
+.limitExhausted {
+    background: rgba(20, 30, 50, 0.9);
+    border: 2px solid rgba(255, 0, 255, 0.5);
+    border-radius: 10px;
+    padding: 20px;
+    margin: 20px 0;
+    text-align: center;
+    box-shadow:
+            0 0 20px rgba(255, 0, 255, 0.3),
+            0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.limitExhausted p {
+    font-family: 'Arial Black', sans-serif;
+    font-size: 16px;
+    color: #fff;
+    text-shadow:
+            0 0 8px #ff00ff,
+            0 0 16px rgba(255, 0, 255, 0.5);
+    letter-spacing: 0.5px;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.limitExhausted p::before {
+    content: '⏳';
+    font-size: 18px;
+    animation: pulse-pink 2s infinite;
+}
+
+@keyframes pulse-pink {
+    0%, 100% {
+        transform: scale(1);
+        text-shadow: 0 0 10px #ff00ff;
+    }
+    50% {
+        transform: scale(1.1);
+        text-shadow: 0 0 20px #ff00ff, 0 0 30px #ff00ff;
+    }
+}

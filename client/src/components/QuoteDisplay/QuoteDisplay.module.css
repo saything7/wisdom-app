@@ -1,55 +1,142 @@
 .container {
-    background: linear-gradient(90deg, #f8f9fa 0%, #e9ecef 100%);
-    background-size: 200% 200%;
-    border-radius: 15px;
-    padding: 30px;
+    background: linear-gradient(135deg,
+    rgba(10, 25, 35, 0.9) 0%,
+    rgba(20, 40, 60, 0.8) 100%);
+    border-radius: 12px;
+    padding: 35px 40px;
     margin: 30px 0;
     position: relative;
-    border-left: 5px solid #667eea;
-    animation: fadeInUp 0.8s ease-out, gradientShift 3s ease infinite;
+    border: 2px solid rgba(0, 255, 234, 0.4);
+    box-shadow:
+            0 10px 30px rgba(0, 0, 0, 0.5),
+            0 0 25px rgba(0, 255, 234, 0.2),
+            inset 0 0 20px rgba(0, 255, 234, 0.1);
     overflow: hidden;
+    animation: containerGlow 4s ease-in-out infinite alternate;
 }
 
+@keyframes containerGlow {
+    0% {
+        box-shadow:
+                0 10px 30px rgba(0, 0, 0, 0.5),
+                0 0 20px rgba(0, 255, 234, 0.2),
+                inset 0 0 15px rgba(0, 255, 234, 0.05);
+    }
+    100% {
+        box-shadow:
+                0 10px 30px rgba(0, 0, 0, 0.5),
+                0 0 35px rgba(0, 255, 234, 0.3),
+                inset 0 0 25px rgba(0, 255, 234, 0.15);
+    }
+}
+
+/* Сканирующая линия */
 .container::before {
     content: '';
     position: absolute;
     top: 0;
     left: -100%;
     width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-    animation: shine 2s ease-in-out;
+    height: 2px;
+    background: linear-gradient(90deg,
+    transparent,
+    rgba(0, 255, 234, 0.9),
+    transparent);
+    animation: scanLine 6s infinite linear;
+    z-index: 1;
 }
 
-@keyframes shine {
+@keyframes scanLine {
     0% { left: -100%; }
     100% { left: 100%; }
 }
 
-.quote {
-    font-size: 1.5rem;
-    line-height: 1.6;
-    color: #333;
-    font-style: italic;
-    margin: 0;
-}
-
-.quoteMark {
-    font-size: 4rem;
-    color: #667eea;
-    opacity: 0.3;
+/* Сетка на фоне */
+.container::after {
+    content: '';
     position: absolute;
-    animation: fadeInUp 1s ease-out;
+    inset: 0;
+    background-image:
+            linear-gradient(rgba(0, 255, 234, 0.05) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0, 255, 234, 0.05) 1px, transparent 1px);
+    background-size: 30px 30px;
+    opacity: 0.3;
+    pointer-events: none;
 }
 
-.quoteMark:first-child {
-    top: 10px;
-    left: 20px;
-    animation-delay: 0.2s;
+.quote {
+    font-family: 'Courier New', monospace;
+    font-size: 1.4rem;
+    line-height: 1.7;
+    color: #e0f7fa;
+    margin: 0;
+    position: relative;
+    z-index: 2;
+    text-shadow: 0 0 5px rgba(0, 255, 234, 0.3);
+    padding-left: 25px;
 }
 
-.quoteMark:last-child {
-    bottom: 10px;
-    right: 20px;
-    animation-delay: 0.4s;
+/* Киберпанк-курсор слева */
+.quote::before {
+    content: '>';
+    color: rgba(0, 255, 234, 0.8);
+    position: absolute;
+    left: 0;
+    top: 0;
+    font-size: 1.6rem;
+    font-weight: bold;
+    animation: cursorBlink 1s infinite;
+    text-shadow:
+            0 0 10px rgba(0, 255, 234, 0.9),
+            0 0 20px rgba(0, 255, 234, 0.4);
 }
+
+@keyframes cursorBlink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+/* Эффект появления букв */
+.letterReveal {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(8px);
+    animation: cyberReveal 0.08s ease forwards;
+    color: inherit;
+    text-shadow:
+            0 0 2px rgba(0, 255, 234, 0.3),
+            0 0 4px rgba(58, 134, 255, 0.2);
+}
+
+@keyframes cyberReveal {
+    0% {
+        opacity: 0;
+        transform: translateY(8px);
+        text-shadow:
+                0 0 0 rgba(0, 255, 234, 0),
+                0 0 0 rgba(58, 134, 255, 0);
+    }
+    50% {
+        text-shadow:
+                0 0 8px rgba(0, 255, 234, 0.6),
+                0 0 15px rgba(58, 134, 255, 0.3);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+        text-shadow:
+                0 0 3px rgba(0, 255, 234, 0.4),
+                0 0 8px rgba(58, 134, 255, 0.2);
+    }
+}
+
+/* Эффект для важных слов */
+.highlight {
+    color: #ff00ff;
+    text-shadow:
+            0 0 8px rgba(255, 0, 255, 0.7),
+            0 0 16px rgba(255, 0, 255, 0.4);
+    font-weight: bold;
+}
+
+/* Убран блок с курсором в конце (::after) полностью */
