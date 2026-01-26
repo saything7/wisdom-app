@@ -1,3 +1,4 @@
+/* Добавляем новые анимации */
 .button {
     padding: 15px 30px;
     font-size: 18px;
@@ -14,6 +15,77 @@
     justify-content: center;
     gap: 10px;
     min-width: 200px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Эффект "волны" при нажатии */
+.button::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.5);
+    opacity: 0;
+    border-radius: 100%;
+    transform: scale(1, 1) translate(-50%);
+    transform-origin: 50% 50%;
+}
+
+.button:focus:not(:active)::after {
+    animation: ripple 1s ease-out;
+}
+
+@keyframes ripple {
+    0% {
+        transform: scale(0, 0);
+        opacity: 0.5;
+    }
+    20% {
+        transform: scale(25, 25);
+        opacity: 0.3;
+    }
+    100% {
+        opacity: 0;
+        transform: scale(40, 40);
+    }
+}
+
+/* Анимация вращения с минимальной длительностью */
+.spinner {
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1.5s linear infinite; /* Увеличиваем время */
+}
+
+/* Гарантируем минимум 2 секунды анимации даже при быстром ответе */
+.spinner.minimum-spin {
+    animation: spin 1.5s linear infinite, fadeOut 0.5s ease 2s forwards;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes fadeOut {
+    to { opacity: 0; }
+}
+
+/* Пульсация для кнопки в состоянии загрузки */
+.button.loading {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4); }
+    50% { box-shadow: 0 4px 25px rgba(102, 126, 234, 0.7); }
+    100% { box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4); }
 }
 
 .button:hover:not(:disabled) {
@@ -30,17 +102,4 @@
     cursor: not-allowed;
     transform: none;
     box-shadow: none;
-}
-
-.spinner {
-    width: 20px;
-    height: 20px;
-    border: 3px solid rgba(255, 255, 255, 0.3);
-    border-radius: 50%;
-    border-top-color: white;
-    animation: spin 1s ease-in-out infinite;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
 }
