@@ -86,24 +86,32 @@ export const storage = {
     },
 
     // Получить информацию о таймере
-        getTimerInfo: () => {
-            const startTime = storage.getTimerStartTime();
+    getTimerInfo: () => {
+        const startTime = storage.getTimerStartTime();
 
-            if (!startTime) {
-                return {
-                    isActive: false,
-                    elapsedSeconds: 0,
-                    remainingSeconds: HOUR_IN_SECONDS,
-                    isExpired: true,
-                    progressPercentage: 0,
-                };
-            }
+        console.log('🔍🔍🔍 getTimerInfo CALLED 🔍🔍🔍');
+        console.log('🔍 Current time:', new Date().toISOString());
+        console.log('🔍 startTime (seconds):', startTime);
+        console.log('🔍 startTime (as Date):', startTime ? new Date(startTime * 1000).toISOString() : 'null');
 
-            const nowSeconds = Math.floor(Date.now() / 1000);
-            const elapsedSeconds = nowSeconds - startTime;
-            const remainingSeconds = Math.max(0, HOUR_IN_SECONDS - elapsedSeconds);
-            const isExpired = elapsedSeconds >= HOUR_IN_SECONDS;
-            const progressPercentage = (elapsedSeconds / HOUR_IN_SECONDS) * 100;
+        if (!startTime) {
+            return { isActive: false, elapsedSeconds: 0, remainingSeconds: HOUR_IN_SECONDS, isExpired: true, progressPercentage: 0 };
+        }
+
+        const nowSeconds = Math.floor(Date.now() / 1000);
+        const elapsedSeconds = nowSeconds - startTime;
+        const remainingSeconds = Math.max(0, HOUR_IN_SECONDS - elapsedSeconds);
+        const isExpired = elapsedSeconds >= HOUR_IN_SECONDS;
+        const progressPercentage = (elapsedSeconds / HOUR_IN_SECONDS) * 100;
+
+
+        console.log('🔍 nowSeconds:', nowSeconds);
+        console.log('🔍 elapsedSeconds:', elapsedSeconds, 'seconds =', Math.floor(elapsedSeconds / 60), 'minutes');
+        console.log('🔍 HOUR_IN_SECONDS:', HOUR_IN_SECONDS);
+        console.log('🔍 isExpired:', elapsedSeconds, '>=', HOUR_IN_SECONDS, '=', isExpired);
+        console.log('🔍 Should reset after:', HOUR_IN_SECONDS - elapsedSeconds, 'seconds');
+
+
 
         return {
             isActive: !isExpired,

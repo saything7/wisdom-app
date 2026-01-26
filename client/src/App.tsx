@@ -6,6 +6,7 @@ import { useAppLogic } from './hooks/useAppLogic';
 import styles from './App.module.css';
 
 const App: React.FC = () => {
+
     const {
         quote,
         error,

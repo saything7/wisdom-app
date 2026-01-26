@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { storage } from '../utils/storage'; // ← ДОБАВЬ ИМПОРТ!
 
 interface CounterState {
     sessionCount: number;
@@ -14,7 +15,7 @@ const initialState: CounterState = {
     lastReset: null,
 };
 
-export const counterSlice = createSlice({  // Добавляем export здесь!
+export const counterSlice = createSlice({
     name: 'counter',
     initialState,
     reducers: {
@@ -38,32 +39,17 @@ export const counterSlice = createSlice({  // Добавляем export здес
             state.maxRequests = action.payload;
         },
         loadFromStorage: (state) => {
-            const savedSession = localStorage.getItem('wisdomSession');
-            const savedTotal = localStorage.getItem('wisdomTotalCount');
+            console.log('📂 loadFromStorage: Loading from storage');
 
-            if (savedSession) {
-                try {
-                    const sessionData = JSON.parse(savedSession);
-                    const sessionStart = new Date(sessionData.timestamp);
-                    const now = new Date();
-                    const diffMinutes = (now.getTime() - sessionStart.getTime()) / (1000 * 60);
+            // Просто синхронизируем с storage.ts
+            // Вся логика таймера уже в storage.ts
+            const session = storage.getSession();
+            state.sessionCount = session?.count || 0;
 
-                    if (diffMinutes < 1) {
-                        state.sessionCount = sessionData.count || 0;
-                    } else {
-                        localStorage.removeItem('wisdomSession');
-                    }
-                } catch (err) {
-                    console.error('Ошибка при загрузке сессии:', err);
-                }
-            }
+            const totalCount = storage.getTotalCount();
+            state.totalCount = totalCount;
 
-            if (savedTotal) {
-                const total = parseInt(savedTotal, 10);
-                if (!isNaN(total)) {
-                    state.totalCount = total;
-                }
-            }
+            console.log('📂 Loaded - sessionCount:', state.sessionCount, 'totalCount:', state.totalCount);
         },
     },
 });
@@ -78,5 +64,3 @@ export const {
 
 // Экспортируем reducer
 export default counterSlice.reducer;
-
-// Экспортируем сам slice (опционально)
