@@ -1,12 +1,16 @@
-// server/src/quotes/quotes.module.ts
 import { Module } from '@nestjs/common';
-import { QuotesService } from './quotes.service';
 import { QuotesController } from './quotes.controller';
-import { CounterService } from '../counter/counter.service';
+import { QuotesService } from './quotes.service';
 
 @Module({
   controllers: [QuotesController],
-  providers: [QuotesService, CounterService],
-  exports: [CounterService], // Чтобы можно было использовать в других модулях
+  providers: [
+    QuotesService,
+    {
+      provide: 'IQuotesService',
+      useExisting: QuotesService, // Используем существующий сервис
+    },
+  ],
+  exports: ['IQuotesService'], // Экспортируем по интерфейсу
 })
 export class QuotesModule {}

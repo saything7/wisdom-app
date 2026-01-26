@@ -19,10 +19,7 @@ export const fetchQuote = createAsyncThunk(
     'quote/fetchQuote',
     async (_, { rejectWithValue }) => {
         try {
-            // Уберите '/api' из пути
             const response = await fetch('http://localhost:3001/quotes/random');
-            // или для production:
-            // const response = await fetch('/quotes/random');
 
             if (!response.ok) {
                 if (response.status === 429) {
@@ -40,6 +37,7 @@ export const fetchQuote = createAsyncThunk(
         }
     }
 );
+
 const quoteSlice = createSlice({
     name: 'quote',
     initialState,
