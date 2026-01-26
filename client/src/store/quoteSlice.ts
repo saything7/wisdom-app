@@ -19,7 +19,13 @@ export const fetchQuote = createAsyncThunk(
     'quote/fetchQuote',
     async (_, { rejectWithValue }) => {
         try {
-            const response = await fetch('http://localhost:3001/api/quotes/random');
+            const response = await fetch('http://localhost:3001/api/quotes/random', {
+                method: 'GET',
+                credentials: 'include', // ← ДОБАВИТЬ ЭТУ СТРОКУ!
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
 
             if (!response.ok) {
                 if (response.status === 429) {
@@ -27,6 +33,7 @@ export const fetchQuote = createAsyncThunk(
                 }
                 return rejectWithValue(`Ошибка сервера: ${response.status}`);
             }
+
             const data = await response.json();
             return {
                 text: data.quote || '',

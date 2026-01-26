@@ -9,7 +9,7 @@ export const API_CONFIG = {
 
     RATE_LIMIT: {
         MAX_REQUESTS: 3,
-        RESET_INTERVAL_MS: 3600000, // 30 секунд
+        RESET_INTERVAL_MS: 3600000,
     },
 
     RETRY_CONFIG: {

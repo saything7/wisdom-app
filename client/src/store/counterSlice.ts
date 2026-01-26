@@ -71,10 +71,8 @@ export const counterSlice = createSlice({  // Добавляем export здес
 // Экспортируем actions
 export const {
     incrementSession,
-    incrementTotal,
     resetSession,
     setSessionCount,
-    setMaxRequests,
     loadFromStorage,
 } = counterSlice.actions;
 

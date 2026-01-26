@@ -86,24 +86,24 @@ export const storage = {
     },
 
     // Получить информацию о таймере
-    getTimerInfo: () => {
-        const startTime = storage.getTimerStartTime();
+        getTimerInfo: () => {
+            const startTime = storage.getTimerStartTime();
 
-        if (!startTime) {
-            return {
-                isActive: false,
-                elapsedSeconds: 0,
-                remainingSeconds: HOUR_IN_SECONDS,
-                isExpired: true,
-                progressPercentage: 0,
-            };
-        }
+            if (!startTime) {
+                return {
+                    isActive: false,
+                    elapsedSeconds: 0,
+                    remainingSeconds: HOUR_IN_SECONDS,
+                    isExpired: true,
+                    progressPercentage: 0,
+                };
+            }
 
-        const nowSeconds = Math.floor(Date.now() / 1000);
-        const elapsedSeconds = nowSeconds - startTime;
-        const remainingSeconds = Math.max(0, HOUR_IN_SECONDS - elapsedSeconds);
-        const isExpired = elapsedSeconds >= HOUR_IN_SECONDS;
-        const progressPercentage = (elapsedSeconds / HOUR_IN_SECONDS) * 100;
+            const nowSeconds = Math.floor(Date.now() / 1000);
+            const elapsedSeconds = nowSeconds - startTime;
+            const remainingSeconds = Math.max(0, HOUR_IN_SECONDS - elapsedSeconds);
+            const isExpired = elapsedSeconds >= HOUR_IN_SECONDS;
+            const progressPercentage = (elapsedSeconds / HOUR_IN_SECONDS) * 100;
 
         return {
             isActive: !isExpired,

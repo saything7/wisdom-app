@@ -48,7 +48,7 @@ export const useWisdomLogic = () => {
         }, 1000);
 
         return () => clearInterval(interval);
-    }, [dispatch, sessionCount]);
+    }, [dispatch]);
 
     const getWisdom = useCallback(async () => {
         // Проверяем, можно ли делать запрос

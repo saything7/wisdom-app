@@ -9,7 +9,6 @@ interface UserCounter {
 @Injectable()
 export class CounterService implements ICounterService {
   private userCounters = new Map<string, UserCounter>();
-  private readonly RESET_INTERVAL = 30000; // 30 секунд
 
   increment(userId: string): number {
     const now = Date.now();

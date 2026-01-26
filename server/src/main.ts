@@ -8,9 +8,13 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
+  app.use(cookieParser());
 
   // CORS из конфигурации
-  app.enableCors(configService.get('cors'));
+  app.enableCors({
+    ...configService.get('cors'),
+    credentials: true, // ← ДОБАВИТЬ
+  });
 
   // Глобальная валидация
   app.useGlobalPipes(
@@ -21,9 +25,7 @@ async function bootstrap() {
     }),
   );
 
-  // Cookie parser
-  app.use(cookieParser());
-
+  // Cookie
   // Swagger документация
   const config = new DocumentBuilder()
     .setTitle('Wisdom API')
