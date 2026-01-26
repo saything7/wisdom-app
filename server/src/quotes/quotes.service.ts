@@ -16,7 +16,7 @@ export class QuotesService implements IQuotesService {
       const quotesPath = path.join(__dirname, '../../data/quotes.json');
       const data = fs.readFileSync(quotesPath, 'utf8');
       this.quotes = JSON.parse(data);
-    } catch (error) {
+    } catch {
       this.quotes = ['Мудрость приходит с опытом.'];
     }
   }
