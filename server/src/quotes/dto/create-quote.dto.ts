@@ -1,16 +1,21 @@
 import { IsString, MinLength, MaxLength, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { VALIDATION_CONSTANTS } from '../constants/validation.constants';
 
 export class CreateQuoteDto {
   @ApiProperty({
     description: 'Текст цитаты',
     example: 'Жизнь - это то, что происходит с тобой, пока ты строишь планы.',
-    minLength: 5,
-    maxLength: 500,
+    minLength: VALIDATION_CONSTANTS.QUOTE.MIN_LENGTH,
+    maxLength: VALIDATION_CONSTANTS.QUOTE.MAX_LENGTH,
   })
   @IsString()
-  @MinLength(5, { message: 'Цитата должна содержать минимум 5 символов' })
-  @MaxLength(500, { message: 'Цитата не должна превышать 500 символов' })
+  @MinLength(VALIDATION_CONSTANTS.QUOTE.MIN_LENGTH, {
+    message: VALIDATION_CONSTANTS.QUOTE.MESSAGES.MIN_LENGTH,
+  })
+  @MaxLength(VALIDATION_CONSTANTS.QUOTE.MAX_LENGTH, {
+    message: VALIDATION_CONSTANTS.QUOTE.MESSAGES.MAX_LENGTH,
+  })
   text: string;
 
   @ApiProperty({
@@ -20,7 +25,9 @@ export class CreateQuoteDto {
   })
   @IsOptional()
   @IsString()
-  @MaxLength(100, { message: 'Имя автора не должно превышать 100 символов' })
+  @MaxLength(VALIDATION_CONSTANTS.AUTHOR.MAX_LENGTH, {
+    message: VALIDATION_CONSTANTS.AUTHOR.MESSAGE,
+  })
   author?: string;
 
   @ApiProperty({
@@ -30,6 +37,8 @@ export class CreateQuoteDto {
   })
   @IsOptional()
   @IsString()
-  @MaxLength(50, { message: 'Категория не должна превышать 50 символов' })
+  @MaxLength(VALIDATION_CONSTANTS.CATEGORY.MAX_LENGTH, {
+    message: VALIDATION_CONSTANTS.CATEGORY.MESSAGE,
+  })
   category?: string;
 }

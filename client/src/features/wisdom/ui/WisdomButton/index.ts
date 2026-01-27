@@ -1,0 +1,1 @@
+export { WisdomButton } from './WisdomButton';

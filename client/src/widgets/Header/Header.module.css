@@ -1,0 +1,92 @@
+.header {
+    margin-bottom: 35px;
+    position: relative;
+    padding-bottom: 25px;
+    text-align: center;
+}
+
+.header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    height: 3px;
+    background: linear-gradient(90deg,
+    transparent,
+    rgba(0, 255, 234, 0.7),
+    rgba(58, 134, 255, 0.7),
+    rgba(255, 0, 255, 0.7),
+    transparent);
+    border-radius: 2px;
+    animation: gradientShift 4s ease infinite;
+}
+
+.title {
+    font-family: 'Arial Black', sans-serif;
+    font-size: 2.8rem;
+    margin-bottom: 10px;
+    background: linear-gradient(135deg,
+    rgba(0, 255, 234, 0.9) 0%,
+    rgba(58, 134, 255, 0.9) 50%,
+    rgba(255, 0, 255, 0.9) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    position: relative;
+    display: inline-block;
+    padding: 0 15px;
+    line-height: 1.2;
+    text-shadow: 0 0 15px rgba(0, 255, 234, 0.4);
+    letter-spacing: 1px;
+}
+
+.subtitle {
+    font-size: 1.1rem;
+    color: rgba(224, 247, 250, 0.8);
+    margin-top: 10px;
+    font-weight: 300;
+    letter-spacing: 0.5px;
+    text-shadow: 0 0 5px rgba(0, 255, 234, 0.3);
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+@media (max-width: 768px) {
+    .header {
+        margin-bottom: 25px;
+        padding-bottom: 20px;
+    }
+
+    .title {
+        font-size: 2.2rem;
+        padding: 0 10px;
+    }
+
+    .header::after {
+        width: 150px;
+    }
+
+    .subtitle {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .title {
+        font-size: 1.8rem;
+    }
+
+    .header::after {
+        width: 120px;
+    }
+
+    .subtitle {
+        font-size: 0.9rem;
+    }
+}

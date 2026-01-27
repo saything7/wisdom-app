@@ -1,23 +1,31 @@
-import { Injectable } from '@nestjs/common';
-import { IQuotesService } from './quotes.service.interface';
+// quotes/quotes.service.ts
+import { Injectable, Inject } from '@nestjs/common';
+import { Response } from 'express';
 import * as crypto from 'crypto';
 
-// Импортируем JSON напрямую
 import quotesData from './data/quotes.json';
+import {
+  IQuotesService,
+  QuoteResponse,
+  QuotesListResponse,
+} from './interfaces/quotes-service.interface';
+import { CreateQuoteDto } from './dto/create-quote.dto';
+import type { ICounterService } from '../counter/interfaces/counter-service.interface';
 
 @Injectable()
 export class QuotesService implements IQuotesService {
   private readonly originalQuotes: string[] = quotesData;
   private currentQuotes: string[] = [];
   private currentIndex = 0;
-  private requestCount = 0;
 
-  constructor() {
+  constructor(
+    @Inject('ICounterService')
+    private readonly counterService: ICounterService,
+  ) {
     this.shuffleQuotes();
   }
 
   private shuffleQuotes(): void {
-    // Создаем копию и перемешиваем алгоритмом Фишера-Йетса
     this.currentQuotes = [...this.originalQuotes];
 
     for (let i = this.currentQuotes.length - 1; i > 0; i--) {
@@ -28,30 +36,74 @@ export class QuotesService implements IQuotesService {
         this.currentQuotes[i],
       ];
     }
-
     this.currentIndex = 0;
   }
 
-  getAllQuotes(): string[] {
-    return [...this.originalQuotes];
+  getAllQuotes(): QuotesListResponse {
+    return {
+      quotes: [...this.originalQuotes],
+      total: this.originalQuotes.length,
+      timestamp: new Date().toISOString(),
+    };
   }
 
   getRandomQuote(): string {
-    this.requestCount++;
-
     if (this.currentQuotes.length === 0) {
       return 'Нет доступных цитат.';
     }
 
-    // Берем следующую цитату из перемешанного массива
     const quote = this.currentQuotes[this.currentIndex];
     this.currentIndex++;
 
-    // Если дошли до конца массива - перемешиваем снова
     if (this.currentIndex >= this.currentQuotes.length) {
       this.shuffleQuotes();
     }
 
     return quote;
+  }
+
+  async getRandomQuoteWithStats(
+    userId: string,
+    res: Response,
+  ): Promise<QuoteResponse> {
+    const quote = this.getRandomQuote();
+
+    const count = await this.counterService.increment(userId);
+    const totalCount = await this.counterService.getTotalCount(userId);
+
+    // Вынести логику кук в отдельный сервис
+    this.setTotalCountCookie(res, totalCount);
+
+    return {
+      quote,
+      count,
+      totalCount,
+      userId,
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  async createQuote(createQuoteDto: CreateQuoteDto): Promise<{
+    message: string;
+    quote: string;
+    author: string;
+    timestamp: string;
+  }> {
+    // Здесь будет логика добавления в БД
+    return {
+      message: 'Цитата добавлена (заглушка)',
+      quote: createQuoteDto.text,
+      author: createQuoteDto.author || 'Неизвестный автор', // ← значение по умолчанию
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  private setTotalCountCookie(res: Response, totalCount: number): void {
+    res.cookie('totalCount', totalCount.toString(), {
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 дней
+      httpOnly: false,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+    });
   }
 }
