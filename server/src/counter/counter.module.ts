@@ -1,3 +1,4 @@
+// counter/counter.module.ts
 import { Module } from '@nestjs/common';
 import { CounterController } from './counter.controller';
 import { CounterService } from './counter.service';
@@ -8,7 +9,7 @@ import { CounterService } from './counter.service';
     CounterService,
     {
       provide: 'ICounterService',
-      useExisting: CounterService,
+      useClass: CounterService,
     },
   ],
   exports: ['ICounterService'],

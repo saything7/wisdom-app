@@ -1,12 +1,19 @@
 import { Controller, Get } from '@nestjs/common';
-import { AppService } from './app.service';
 
+// app.controller.ts
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
-
   @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  getInfo() {
+    return {
+      name: 'Цитатник Джейсона Стэйтэма',
+      version: '1.0',
+      description: 'API для мудрых цитат',
+      docs: '/api/docs',
+      endpoints: {
+        quotes: '/quotes',
+        counter: '/counter',
+      },
+    };
   }
 }
