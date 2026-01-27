@@ -12,7 +12,6 @@ import { COUNTER_CONSTANTS } from './constants/counter.constants';
 export class CounterService implements ICounterService {
   private readonly logger = new Logger(CounterService.name);
   private userCounters = new Map<string, UserCounter>();
-  private readonly RESET_INTERVAL = 30000; // 30 секунд
 
   increment(userId: string): number {
     try {

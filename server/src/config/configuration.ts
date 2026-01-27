@@ -8,8 +8,8 @@ export default () => ({
     credentials: true,
   },
   rateLimit: {
-    ttl: parseInt(process.env.RATE_LIMIT_TTL || '30000', 10),
-    limit: parseInt(process.env.RATE_LIMIT_MAX || '333', 10),
+    ttl: parseInt(process.env.RATE_LIMIT_TTL || '3600000', 10),
+    limit: parseInt(process.env.RATE_LIMIT_MAX || '6', 10),
   },
   cookies: {
     maxAge: parseInt(process.env.COOKIE_MAX_AGE || '2592000000', 10), // 30 дней

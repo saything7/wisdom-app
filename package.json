@@ -2,6 +2,7 @@
   "name": "wisdom-app",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "concurrently \"npm run dev:client\" \"npm run dev:server\"",
     "dev:client": "cd client && npm run dev",
@@ -12,12 +13,19 @@
     "test": "concurrently \"npm run test:client\" \"npm run test:server\"",
     "test:client": "cd client && npm test",
     "test:server": "cd server && npm test",
-    "lint": "concurrently \"npm run lint:client\" \"npm run lint:server\"",
-    "lint:client": "cd client && npm run lint",
-    "lint:server": "cd server && npm run lint"
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "lint:client": "eslint client/",
+    "lint:server": "eslint server/"
+
+
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
+    "@types/clean-webpack-plugin": "^0.1.2",
+    "@types/html-webpack-plugin": "^3.2.9",
+    "@types/webpack": "^5.28.5",
+    "@types/webpack-dev-server": "^4.7.2",
     "concurrently": "^8.2.2",
     "eslint": "^9.39.2",
     "eslint-plugin-react": "^7.37.5",
