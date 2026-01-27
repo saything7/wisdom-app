@@ -34,17 +34,12 @@ export const useWisdomLogic = () => {
 
     // ========== СИНХРОНИЗАЦИЯ ПРИ ЗАГРУЗКЕ ==========
     useEffect(() => {
-        console.log('🔧 useWisdomLogic: Initial sync with localStorage');
 
         // 1. Синхронизируем sessionCount
         const session = storage.getSession();
         const storedSessionCount = session?.count || 0;
 
-        console.log('🔧 Stored sessionCount:', storedSessionCount);
-        console.log('🔧 Redux sessionCount:', sessionCount);
-
         if (storedSessionCount !== sessionCount) {
-            console.log('🔧 Syncing sessionCount:', storedSessionCount);
             dispatch(setSessionCount(storedSessionCount));
         }
 
@@ -60,13 +55,11 @@ export const useWisdomLogic = () => {
             const wasReset = storage.checkAndResetIfExpired();
 
             if (wasReset) {
-                console.log('🔄 Timer expired in interval check');
                 // Получаем актуальное состояние из storage
                 const session = storage.getSession();
                 const currentCount = session?.count || 0;
 
                 if (currentCount > 0) {
-                    console.log('🔄 Resetting Redux session');
                     dispatch(resetSession());
                 }
             }
@@ -80,7 +73,6 @@ export const useWisdomLogic = () => {
     const getWisdom = useCallback(async () => {
         // Проверяем, можно ли делать запрос
         if (!uiStatus.canMakeRequest) {
-            console.log('Лимит исчерпан. Подождите:', storage.getTimeUntilReset());
             return;
         }
 
