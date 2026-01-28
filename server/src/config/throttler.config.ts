@@ -7,6 +7,6 @@ export const getThrottlerConfig = (
 ): ThrottlerModuleOptions => [
   {
     ttl: configService.get<number>('rateLimit.ttl') || 3600000,
-    limit: configService.get<number>('rateLimit.limit') || 300,
+    limit: configService.get<number>('rateLimit.limit') || 3,
   },
 ];

@@ -17,7 +17,6 @@ export const MainContent: React.FC<MainContentProps> = ({
                                                             quote,
                                                             totalLoading,
                                                             showQuoteWithDelay,
-                                                            hasInitialClick,
                                                             isLimitExhausted,
                                                             showInitialButton,
                                                             onGetWisdom

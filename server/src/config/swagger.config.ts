@@ -1,5 +1,5 @@
 // src/config/swagger.config.ts
-import { DocumentBuilder, SwaggerDocumentOptions } from '@nestjs/swagger';
+import { DocumentBuilder } from '@nestjs/swagger';
 import { SwaggerModule } from '@nestjs/swagger';
 
 export class SwaggerConfig {

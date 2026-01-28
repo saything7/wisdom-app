@@ -24,7 +24,8 @@ export const WisdomButton: React.FC<WisdomButtonProps> = ({
             {showSpinner ? (
                 <div className={styles.buttonSpinner} />
             ) : (
-                'Дай мне мудрость'
+                'Дай пожалуйста мне мудрость, ' +
+                'я знаю, что я читер :('
             )}
         </button>
     );

@@ -39,7 +39,7 @@ export const TimerDisplay: React.FC<TimerDisplayProps> = ({
             </div>
 
             <div className={styles.requestsInfo}>
-                Использовано {sessionCount} из {maxRequests} запросов в этой сессии
+                Использовано {sessionCount} из {maxRequests}-х запросов в этой сессии
             </div>
         </div>
     );

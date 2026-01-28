@@ -15,7 +15,6 @@ const getTotalCountFromCookie = (): number => {
 export interface CounterDisplayProps {
     sessionCount: number;
     maxRequests: number;
-    // totalCount НЕ ПЕРЕДАЁТСЯ извне
 }
 
 export const CounterDisplay: React.FC<CounterDisplayProps> = ({
@@ -24,7 +23,6 @@ export const CounterDisplay: React.FC<CounterDisplayProps> = ({
                                                        }) => {
     const [totalCount, setTotalCount] = useState<number>(0);
 
-    // Берём значение ТОЛЬКО из кук сервера
     useEffect(() => {
         const cookieValue = getTotalCountFromCookie();
         setTotalCount(cookieValue);
