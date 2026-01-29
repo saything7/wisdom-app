@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "webpack serve --mode development --open",
     "test": "jest",
-    "lint": "eslint src --ext ts,tsx",
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix",
     "start": "webpack serve --config webpack.config.ts",
     "build": "NODE_ENV=production webpack --config webpack.config.ts",
     "type-check": "tsc --noEmit"

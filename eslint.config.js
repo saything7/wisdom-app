@@ -4,58 +4,44 @@ import tseslint from "typescript-eslint";
 import pluginReact from "eslint-plugin-react";
 
 export default tseslint.config(
-    {
-        ignores: ["**/dist/**", "**/node_modules/**", "**/build/**"]
-    },
-
-    // Базовые правила
+    { ignores: ["**/dist/**", "**/node_modules/**", "**/build/**", "**/coverage/**"] },
     js.configs.recommended,
-
-    // TypeScript правила
     ...tseslint.configs.recommended,
-
-    // React правила С НАСТРОЙКАМИ
     {
         ...pluginReact.configs.flat.recommended,
-        settings: {
-            react: {
-                version: "detect" // или "18.3.1"
-            }
-        }
+        settings: { react: { version: "detect" } }
     },
-
-    // Клиент (браузер)
     {
-        files: ["client/**/*.{js,ts,jsx,tsx}"],
-        languageOptions: {
-            globals: globals.browser
-        },
         rules: {
-            "react/no-unescaped-entities": "off",
-            "@typescript-eslint/no-explicit-any": "off"
+            "@typescript-eslint/no-explicit-any": "warn",
+            "no-console": ["warn", { allow: ["warn", "error"] }],
+            "react/react-in-jsx-scope": "off",
+            "react/display-name": "off",
         }
     },
-
-    // Сервер (Node.js)
     {
-        files: ["server/**/*.{js,ts}"],
-        languageOptions: {
-            globals: globals.node
-        },
+        files: ["**/*.spec.{js,ts,jsx,tsx}", "**/*.test.{js,ts,jsx,tsx}"],
         rules: {
-            "@typescript-eslint/no-unused-vars": ["error", {
-                "argsIgnorePattern": "^_",
-                "varsIgnorePattern": "^_"
-            }]
+            "@typescript-eslint/no-explicit-any": "off",
+            "@typescript-eslint/no-unused-vars": "off",
+            "@typescript-eslint/no-require-imports": "off",
+            "no-console": "off",
         }
     },
-
-    // Конфигурационные файлы
     {
-        files: ["**/*.config.*", "**/webpack.*"],
+        files: ["client/**/*"],
+        languageOptions: { globals: { ...globals.browser, ...globals.jest } }
+    },
+    {
+        files: ["server/**/*"],
+        languageOptions: { globals: { ...globals.node, ...globals.jest } }
+    },
+    {
+        files: ["**/webpack.*", "**/*.config.*"],
         rules: {
             "@typescript-eslint/no-require-imports": "off",
-            "@typescript-eslint/no-explicit-any": "off"
+            "@typescript-eslint/no-explicit-any": "off",
         }
     }
+
 );

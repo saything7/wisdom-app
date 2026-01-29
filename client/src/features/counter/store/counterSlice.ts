@@ -39,7 +39,6 @@ export const counterSlice = createSlice({
             state.maxRequests = action.payload;
         },
         loadFromStorage: (state) => {
-            console.log('📂 loadFromStorage: Loading from storage');
 
             // Просто синхронизируем с storage.ts
             const session = storage.getSession();
@@ -47,9 +46,7 @@ export const counterSlice = createSlice({
 
             const totalCount = storage.getTotalCount();
             state.totalCount = totalCount;
-
-            console.log('📂 Loaded - sessionCount:', state.sessionCount, 'totalCount:', state.totalCount);
-        },
+            },
     },
 });
 

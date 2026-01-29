@@ -4,35 +4,50 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "concurrently \"npm run dev:client\" \"npm run dev:server\"",
+    "install:all": "npm install && cd client && npm install && cd ../server && npm install",
+
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
     "dev:client": "cd client && npm run dev",
     "dev:server": "cd server && npm run start:dev",
-    "build": "concurrently \"npm run build:client\" \"npm run build:server\"",
+
+    "build": "concurrently \"npm run build:server\" \"npm run build:client\"",
     "build:client": "cd client && npm run build",
     "build:server": "cd server && npm run build",
-    "test": "concurrently \"npm run test:client\" \"npm run test:server\"",
+
+    "test": "concurrently \"npm run test:server\" \"npm run test:client\"",
     "test:client": "cd client && npm test",
     "test:server": "cd server && npm test",
-    "lint": "eslint .",
+    "test:e2e": "playwright test",
+
+    "test:watch": "npm run test:watch:client",
+    "test:watch:client": "cd client && npm run test:watch",
+    "test:watch:server": "cd server && npm run test:watch",
+
+    "test:coverage": "concurrently \"npm run test:coverage:server\" \"npm run test:coverage:client\"",
+    "test:coverage:client": "cd client && npm run test:coverage",
+    "test:coverage:server": "cd server && npm run test:coverage",
+
+    "test:ui": "playwright test --ui",
+    "test:report": "playwright show-report",
+
+    "lint": "concurrently \"npm run lint:server\" \"npm run lint:client\"",
+    "lint:client": "cd client && npm run lint",
+    "lint:server": "cd server && npm run lint",
     "lint:fix": "eslint . --fix",
-    "lint:client": "eslint client/",
-    "lint:server": "eslint server/"
+
+    "preinstall": "npx only-allow npm"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.2",
-    "@types/clean-webpack-plugin": "^0.1.2",
-    "@types/html-webpack-plugin": "^3.2.9",
-    "@types/webpack": "^5.28.5",
-    "@types/webpack-dev-server": "^4.7.2",
+    "@playwright/test": "^1.40.0",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/jest": "^30.0.0",
     "concurrently": "^8.2.2",
     "eslint": "^9.39.2",
-    "eslint-plugin-react": "^7.37.5",
     "globals": "^17.1.0",
-    "jiti": "^2.6.1",
-    "postcss-modules-extract-imports": "^3.1.0",
-    "postcss-modules-local-by-default": "^4.2.0",
-    "postcss-modules-scope": "^3.2.1",
-    "postcss-modules-values": "^4.0.0",
+    "jest": "^30.2.0",
+    "jest-environment-jsdom": "^30.2.0",
     "typescript-eslint": "^8.53.1"
   },
   "workspaces": [
