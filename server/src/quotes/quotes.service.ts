@@ -1,7 +1,5 @@
-// quotes/quotes.service.ts
 import { Injectable, Inject } from '@nestjs/common';
 import { Response } from 'express';
-import * as crypto from 'crypto';
 
 import quotesData from './data/quotes.json';
 import {
@@ -14,52 +12,29 @@ import type { ICounterService } from '../counter/interfaces/counter-service.inte
 
 @Injectable()
 export class QuotesService implements IQuotesService {
-  private readonly originalQuotes: string[] = quotesData;
-  private currentQuotes: string[] = [];
-  private currentIndex = 0;
+  private readonly quotes: string[] = quotesData;
 
   constructor(
     @Inject('ICounterService')
     private readonly counterService: ICounterService,
-  ) {
-    this.shuffleQuotes();
-  }
-
-  private shuffleQuotes(): void {
-    this.currentQuotes = [...this.originalQuotes];
-
-    for (let i = this.currentQuotes.length - 1; i > 0; i--) {
-      const randomBytes = crypto.randomBytes(4);
-      const j = randomBytes.readUInt32BE(0) % (i + 1);
-      [this.currentQuotes[i], this.currentQuotes[j]] = [
-        this.currentQuotes[j],
-        this.currentQuotes[i],
-      ];
-    }
-    this.currentIndex = 0;
-  }
+  ) {}
 
   getAllQuotes(): QuotesListResponse {
     return {
-      quotes: [...this.originalQuotes],
-      total: this.originalQuotes.length,
+      quotes: [...this.quotes],
+      total: this.quotes.length,
       timestamp: new Date().toISOString(),
     };
   }
 
   getRandomQuote(): string {
-    if (this.currentQuotes.length === 0) {
+    if (this.quotes.length === 0) {
       return 'Нет доступных цитат.';
     }
 
-    const quote = this.currentQuotes[this.currentIndex];
-    this.currentIndex++;
-
-    if (this.currentIndex >= this.currentQuotes.length) {
-      this.shuffleQuotes();
-    }
-
-    return quote;
+    // Используем Math.random() для выбора случайной цитаты
+    const randomIndex = Math.floor(Math.random() * this.quotes.length);
+    return this.quotes[randomIndex];
   }
 
   async getRandomQuoteWithStats(
@@ -71,7 +46,6 @@ export class QuotesService implements IQuotesService {
     const count = await this.counterService.increment(userId);
     const totalCount = await this.counterService.getTotalCount(userId);
 
-    // Вынести логику кук в отдельный сервис
     this.setTotalCountCookie(res, totalCount);
 
     return {
@@ -89,18 +63,17 @@ export class QuotesService implements IQuotesService {
     author: string;
     timestamp: string;
   }> {
-    // Здесь будет логика добавления в БД
     return {
       message: 'Цитата добавлена (заглушка)',
       quote: createQuoteDto.text,
-      author: createQuoteDto.author || 'Неизвестный автор', // ← значение по умолчанию
+      author: createQuoteDto.author || 'Неизвестный автор',
       timestamp: new Date().toISOString(),
     };
   }
 
   private setTotalCountCookie(res: Response, totalCount: number): void {
     res.cookie('totalCount', totalCount.toString(), {
-      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 дней
+      maxAge: 30 * 24 * 60 * 60 * 1000,
       httpOnly: false,
       sameSite: 'lax',
       secure: process.env.NODE_ENV === 'production',

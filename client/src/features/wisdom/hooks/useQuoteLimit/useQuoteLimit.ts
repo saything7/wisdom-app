@@ -12,7 +12,13 @@ export const useQuoteLimit = () => {
         const now = Math.floor(Date.now() / 1000);
 
         if (savedQuotes) {
-            setQuotesUsed(parseInt(savedQuotes));
+            const parsedQuotes = parseInt(savedQuotes);
+            setQuotesUsed(parsedQuotes);
+
+            // Проверяем, не превышен ли лимит
+            if (parsedQuotes >= 3) {
+                setIsLimitExhausted(true);
+            }
         }
 
         // Проверяем, не истёк ли лимит по времени
@@ -31,6 +37,11 @@ export const useQuoteLimit = () => {
     }, []);
 
     const incrementQuotes = () => {
+        // Проверяем, не превышен ли лимит
+        if (quotesUsed >= 3 || isLimitExhausted) {
+            return; // Не увеличиваем счетчик, если лимит исчерпан
+        }
+
         const newCount = quotesUsed + 1;
         setQuotesUsed(newCount);
         localStorage.setItem('quotesUsed', newCount.toString());
