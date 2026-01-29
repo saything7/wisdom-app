@@ -1,9 +1,9 @@
 import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import { storage } from '@/utils/storage';
-import { AppDispatch } from '@/app/store'; // ← Добавьте этот импорт если нужно
+import { AppDispatch } from '@/app/store';
 
-// Импорты actions из новых мест
+// Импорты actions
 import { fetchQuote, clearQuote } from '@/features/wisdom/store/quoteSlice';
 import {
     incrementSession,
@@ -13,8 +13,18 @@ import {
 
 import { getErrorMessage, isRateLimitError } from './helpers';
 
+// Интерфейс для UI статуса
+interface UIStatus {
+    canMakeRequest: boolean;
+    remainingRequests: number;
+    timeLeft: number;
+    shouldShowTimer: boolean;
+    isTimerActive: boolean;
+    isLimitExhausted: boolean;
+}
+
 export const useWisdomHandlers = (maxRequests: number, totalCount: number) => {
-    const dispatch = useDispatch<AppDispatch>(); // ← Добавьте типизацию если используете TypeScript
+    const dispatch = useDispatch<AppDispatch>();
 
     // Обработка успешного получения цитаты
     const handleSuccessfulQuote = useCallback((quoteText: string) => {
@@ -36,8 +46,6 @@ export const useWisdomHandlers = (maxRequests: number, totalCount: number) => {
 
     // Обработка ошибки лимита запросов
     const handleRateLimitError = useCallback(() => {
-        console.log('🚨 Rate limit error detected');
-
         storage.startTimer();
         storage.setSession(maxRequests);
         dispatch(setSessionCount(maxRequests));
@@ -45,23 +53,19 @@ export const useWisdomHandlers = (maxRequests: number, totalCount: number) => {
         return storage.getUIStatus();
     }, [dispatch, maxRequests]);
 
-    // Основной обработчик получения цитаты - ИСПРАВЛЕННАЯ ВЕРСИЯ
-    const getWisdomHandler = useCallback(async (uiStatus: any) => {
-        console.log('getWisdomHandler called, canMakeRequest:', uiStatus.canMakeRequest);
-
+    // Основной обработчик получения цитаты
+    const getWisdomHandler = useCallback(async (uiStatus: UIStatus) => {
         if (!uiStatus.canMakeRequest) {
-            console.log('❌ Cannot make request, limit exhausted');
             return null;
         }
 
         try {
-            console.log('🔄 Fetching quote...');
-            // Явно указываем тип dispatch
             const resultAction = await dispatch(fetchQuote());
 
             if (fetchQuote.fulfilled.match(resultAction)) {
-                console.log('✅ Quote fetched successfully:', resultAction.payload);
-                return handleSuccessfulQuote(resultAction.payload.text);
+                const payload = resultAction.payload as { text?: string };
+                const quoteText = payload?.text || 'No quote text';
+                return handleSuccessfulQuote(quoteText);
             }
 
             if (fetchQuote.rejected.match(resultAction)) {
@@ -69,34 +73,35 @@ export const useWisdomHandlers = (maxRequests: number, totalCount: number) => {
                 const errorMessage = getErrorMessage(resultAction);
 
                 if (isRateLimitError(errorMessage)) {
-                    console.log('🔄 Handling rate limit error');
                     return handleRateLimitError();
                 }
 
-                // Бросаем ошибку дальше, но без "throw new Error" чтобы не дублировать
                 throw new Error(`API Error: ${errorMessage}`);
             }
-        } catch (error: any) {
+        } catch (error) {  // <-- УБРАЛИ `: unknown`
             console.error('🔥 Error in getWisdomHandler:', error);
 
-            // Проверяем, не rate limit ли это
-            const errorMsg = error?.message || error?.toString() || 'Unknown error';
+            let errorMsg = 'Unknown error';
+
+            if (error instanceof Error) {
+                errorMsg = error.message;
+            } else if (typeof error === 'string') {
+                errorMsg = error;
+            } else if (error && typeof error === 'object' && 'message' in error) {
+                errorMsg = String((error as { message?: unknown }).message);
+            }
 
             if (isRateLimitError(errorMsg)) {
-                console.log('🔄 Handling rate limit error in catch');
                 return handleRateLimitError();
             }
 
-            // Бросаем ошибку дальше
             throw error;
         }
 
         return null;
     }, [dispatch, handleSuccessfulQuote, handleRateLimitError]);
-
     // Сброс лимита
     const resetLimitHandler = useCallback(() => {
-        console.log('🔄 Resetting limit...');
         storage.resetAll();
         dispatch(resetSession());
         dispatch(clearQuote());

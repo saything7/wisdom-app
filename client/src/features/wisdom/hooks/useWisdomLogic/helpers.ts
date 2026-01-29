@@ -1,12 +1,19 @@
-export const getErrorMessage = (resultAction: any): string => {
-    if (typeof resultAction.error === 'string') {
-        return resultAction.error;
+interface ErrorResult {
+    error?: string | { message?: string };
+    payload?: unknown;
+}
+
+export const getErrorMessage = (resultAction: unknown): string => {
+    const action = resultAction as ErrorResult;
+
+    if (typeof action.error === 'string') {
+        return action.error;
     }
-    if (resultAction.error?.message) {
-        return resultAction.error.message;
+    if (action.error && typeof action.error === 'object' && 'message' in action.error) {
+        return String(action.error.message);
     }
-    if (resultAction.payload) {
-        return String(resultAction.payload);
+    if (action.payload) {
+        return String(action.payload);
     }
     return 'Unknown error';
 };

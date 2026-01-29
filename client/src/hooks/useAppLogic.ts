@@ -40,7 +40,8 @@ export const useAppLogic = () => {
 
         try {
             await getWisdom();
-        } catch (err) {
+        } catch (__err) {
+            console.error('Error:', __err);
             setIsLoadingManual(false);
             setHasInitialClick(false);
         }

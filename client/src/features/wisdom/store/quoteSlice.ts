@@ -21,7 +21,6 @@ export const fetchQuote = createAsyncThunk(
     'wisdom/fetchQuote',
     async (_, { rejectWithValue }) => {
         try {
-            console.log('🌐 Fetching quote from API...');
             const response = await fetch(
                 `${WISDOM_API_CONFIG.BASE_URL}${WISDOM_API_CONFIG.ENDPOINTS.RANDOM_QUOTE}`,
                 {
@@ -41,19 +40,29 @@ export const fetchQuote = createAsyncThunk(
             }
 
             const data = await response.json();
-            console.log('📥 API response:', data);
 
             return {
                 text: data.quote || '',
                 count: data.count || 0,
             };
-        } catch (error: any) {
+        } catch (error) { // УБИРАЕМ `: unknown`
             console.error('❌ Error in fetchQuote:', error);
-            return rejectWithValue(error.message || 'Неизвестная ошибка');
+
+            // Безопасное получение сообщения об ошибке
+            let errorMessage = 'Неизвестная ошибка';
+
+            if (error instanceof Error) {
+                errorMessage = error.message;
+            } else if (typeof error === 'string') {
+                errorMessage = error;
+            } else if (error && typeof error === 'object' && 'message' in error) {
+                errorMessage = String((error as { message?: unknown }).message);
+            }
+
+            return rejectWithValue(errorMessage);
         }
     }
 );
-
 const quoteSlice = createSlice({
     name: 'wisdom/quote', // ← Изменяем имя
     initialState,

@@ -17,9 +17,6 @@ async function bootstrap() {
   // Запуск сервера
   const port = configService.get('server.port');
   await app.listen(port);
-
-  console.log(`Server running on http://localhost:${port}`);
-  console.log(`Swagger docs: http://localhost:${port}/api/docs`);
 }
 
 // В конце bootstrap() добавить обработку ошибок

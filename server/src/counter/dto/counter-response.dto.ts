@@ -38,7 +38,7 @@ export class AllStatsResponseDto {
       },
     },
   })
-  counters: Record<string, any>;
+  counters: Record<string, unknown>;
 
   @ApiProperty({ description: 'Время формирования ответа' })
   timestamp: string;

@@ -1,5 +1,5 @@
 // counter/counter.service.ts
-import { Injectable, Inject, Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import {
   ICounterService,
   UserCounter,
