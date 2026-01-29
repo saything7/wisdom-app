@@ -48,7 +48,7 @@ export const MainContent: React.FC<MainContentProps> = ({
                 disabled={isLimitExhausted}
             >
                 Поделись со мной своей мудростью,
-                Джейсон Стэйтэм!
+                Джейсон Стетхем!
             </button>
         );
     }
